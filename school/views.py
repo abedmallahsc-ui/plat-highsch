@@ -85,21 +85,23 @@ def dashboard(request):
         assessments = (
             Assessment.objects.filter(school_class=student.school_class)
             .select_related('subject', 'teacher', 'school_class')
-            .order_by('-created_at')[:50]
+            .order_by('-created_at')
         )
         if selected_subject_id:
             assessments = assessments.filter(subject_id=selected_subject_id)
+        assessments = assessments[:50]
         submissions = (
             AssessmentSubmission.objects.filter(student=student)
             .select_related('assessment')
-            .order_by('-submitted_at')[:50]
+            .order_by('-submitted_at')
         )
         grade_sheets = FinalGradeSheet.objects.filter(student=student, published=True).order_by('-created_at')[:20]
+        grades = submissions.filter(status='reviewed')
         context = {
             'student': student,
             'assessments': assessments,
-            'submissions': submissions,
-            'grades': submissions.filter(status='reviewed'),
+            'submissions': submissions[:50],
+            'grades': grades,
             'grade_sheets': grade_sheets,
             'programs': Program.objects.filter(school_class=student.school_class).order_by('-created_at')[:20],
             'announcement_text': 'New assessments have been published for your class.',
@@ -121,17 +123,19 @@ def dashboard(request):
         assessments = (
             Assessment.objects.filter(school_class__in=class_ids)
             .select_related('subject', 'teacher', 'school_class')
-            .order_by('-created_at')[:50]
+            .order_by('-created_at')
         )
         if selected_class_id:
             assessments = assessments.filter(school_class_id=selected_class_id)
+        assessments = assessments[:50]
         submissions = (
             AssessmentSubmission.objects.filter(assessment__school_class__in=class_ids)
             .select_related('assessment', 'student')
-            .order_by('-submitted_at')[:100]
+            .order_by('-submitted_at')
         )
         if selected_class_id:
             submissions = submissions.filter(assessment__school_class_id=selected_class_id)
+        submissions = submissions[:100]
         context = {
             'teacher': teacher,
             'assessments': assessments,
