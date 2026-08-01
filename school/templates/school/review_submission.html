@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Submission</title>
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #f4f8ff 0%, #fff7ed 100%); color: #0f172a; }
+        .card { max-width: 860px; margin: 40px auto; background: white; padding: 28px; border-radius: 20px; box-shadow: 0 16px 40px rgba(15,23,42,0.12); }
+        .meta { background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 16px; }
+        pre { background: #0f172a; color: white; padding: 16px; border-radius: 12px; white-space: pre-wrap; }
+        form { display: grid; gap: 12px; }
+        input, textarea { padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 15px; }
+        button { padding: 12px 14px; border: none; border-radius: 12px; background: linear-gradient(135deg, #2563eb, #1e40af); color: white; cursor: pointer; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Review Submission</h1>
+        <div class="meta">
+            <p><strong>Student:</strong> {{ submission.student }}</p>
+            <p><strong>Assessment:</strong> {{ submission.assessment }}</p>
+        </div>
+        <p><strong>Submitted work:</strong></p>
+        <pre>{{ submission.content }}</pre>
+
+        <form method="post">
+            {% csrf_token %}
+            <label>Mark</label>
+            <input type="number" name="mark" value="{{ submission.mark|default:'' }}">
+            <label>Feedback</label>
+            <textarea name="feedback" rows="8">{{ submission.feedback }}</textarea>
+            <button type="submit">Save Review</button>
+        </form>
+    </div>
+</body>
+</html>

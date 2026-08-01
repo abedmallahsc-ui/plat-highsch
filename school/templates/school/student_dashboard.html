@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #f4f8ff 0%, #fff7ed 100%); color: #0f172a; }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 270px; background: linear-gradient(140deg, #0f172a 0%, #1d4ed8 100%); color: white; padding: 24px 18px; }
+        .sidebar h2 { margin-top: 0; font-size: 24px; }
+        .sidebar a { display: block; color: white; text-decoration: none; padding: 12px 12px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.08); }
+        .sidebar a.active { background: rgba(255,255,255,0.22); }
+        .main { flex: 1; padding: 28px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card { background: white; border-radius: 18px; padding: 20px; box-shadow: 0 12px 30px rgba(15,23,42,0.08); margin-bottom: 16px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid #e2e8f0; }
+        th { background: #eff6ff; }
+        .pill { display: inline-block; padding: 5px 10px; border-radius: 999px; background: #dcfce7; color: #166534; font-size: 12px; }
+        .btn { display: inline-block; padding: 8px 12px; border-radius: 10px; background: #2563eb; color: white; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>Student</h2>
+            <a class="{% if section == 'assessments' %}active{% endif %}" href="?section=assessments{% if selected_subject_id %}&subject_id={{ selected_subject_id }}{% endif %}">Assessments</a>
+            <a class="{% if section == 'program' %}active{% endif %}" href="?section=program{% if selected_subject_id %}&subject_id={{ selected_subject_id }}{% endif %}">Program</a>
+            <a class="{% if section == 'grades' %}active{% endif %}" href="?section=grades{% if selected_subject_id %}&subject_id={{ selected_subject_id }}{% endif %}">Grades</a>
+            <a class="{% if section == 'announcements' %}active{% endif %}" href="?section=announcements{% if selected_subject_id %}&subject_id={{ selected_subject_id }}{% endif %}">Announcements</a>
+            <a href="{% url 'custom_logout' %}">Logout</a>
+        </aside>
+        <main class="main">
+            <div class="topbar">
+                <div>
+                    <h1>Hello, {{ student.full_name }}</h1>
+                    <p>Class: {{ student.school_class.name }}</p>
+                </div>
+            </div>
+
+            {% if section == 'assessments' %}
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <h3>Assessments</h3>
+                    <form method="get" style="display:flex; gap:8px; align-items:center;">
+                        <label for="subject_id" style="font-weight:600;">Choose subject</label>
+                        <select id="subject_id" name="subject_id" style="padding:8px 10px; border-radius:8px; border:1px solid #cbd5e1;">
+                            {% for subject in available_subjects %}
+                                <option value="{{ subject.id }}" {% if selected_subject_id|default:'' == subject.id|stringformat:'s' %}selected{% endif %}>{{ subject.name }}</option>
+                            {% empty %}
+                                <option value="">No subjects available</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn">View</button>
+                    </form>
+                </div>
+                <table>
+                    <tr><th>Title</th><th>Type</th><th>Due</th><th>Action</th></tr>
+                    {% for assessment in assessments %}
+                    <tr>
+                        <td>{{ assessment.title }}</td>
+                        <td>{{ assessment.get_assessment_type_display }}</td>
+                        <td>{{ assessment.due_date|default:"-" }}</td>
+                        <td><a href="{% url 'submit_assessment' assessment.id %}">Upload</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4">No assessments yet.</td></tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>My Submissions</h3>
+                <table>
+                    <tr><th>Assessment</th><th>Status</th><th>Mark</th><th>Feedback</th></tr>
+                    {% for submission in submissions %}
+                    <tr>
+                        <td>{{ submission.assessment.title }}</td>
+                        <td><span class="pill">{{ submission.get_status_display }}</span></td>
+                        <td>{{ submission.mark|default:"-" }}</td>
+                        <td>{{ submission.feedback|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4">No submissions yet.</td></tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% endif %}
+
+            {% if section == 'program' %}
+            <div class="card">
+                <h3>Program</h3>
+                <ul>
+                    {% for program in programs %}
+                    <li><strong>{{ program.title }}</strong> - {{ program.description }}</li>
+                    {% empty %}
+                    <li>No program published yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if section == 'grades' %}
+            <div class="card">
+                <h3>Final Grade Sheets</h3>
+                <ul>
+                    {% for sheet in grade_sheets %}
+                    <li><strong>{{ sheet.term }}</strong>: {{ sheet.total_marks }} marks, average {{ sheet.average }}</li>
+                    {% empty %}
+                    <li>No final grades published yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if section == 'announcements' %}
+            <div class="card">
+                <h3>Announcement</h3>
+                <p>{{ announcement_text }}</p>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>

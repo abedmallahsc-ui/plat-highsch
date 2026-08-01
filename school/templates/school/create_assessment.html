@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Assessment</title>
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #f4f8ff 0%, #fff7ed 100%); color: #0f172a; }
+        .card { max-width: 760px; margin: 40px auto; background: white; padding: 28px; border-radius: 20px; box-shadow: 0 16px 40px rgba(15,23,42,0.12); }
+        form { display: grid; gap: 12px; }
+        input, select, textarea { padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 15px; }
+        button { padding: 12px 14px; border: none; border-radius: 12px; background: linear-gradient(135deg, #2563eb, #1e40af); color: white; cursor: pointer; font-weight: 700; }
+        h1 { margin-top: 0; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Create Assessment</h1>
+        <p>Only your assigned subject and class sections can be selected.</p>
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" name="title" placeholder="Assessment title" required>
+            <select name="assessment_type" required>
+                <option value="assignment">Assignment</option>
+                <option value="exam">Exam</option>
+                <option value="project">Project</option>
+                <option value="quiz">Quiz</option>
+                <option value="other">Other</option>
+            </select>
+            <select name="subject" required>
+                {% for subject in allowed_subjects %}
+                <option value="{{ subject.id }}">{{ subject.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="school_class" required>
+                {% for school_class in allowed_classes %}
+                <option value="{{ school_class.id }}">{{ school_class.name }}</option>
+                {% endfor %}
+            </select>
+            <textarea name="description" rows="5" placeholder="Description"></textarea>
+            <input type="date" name="due_date">
+            <button type="submit">Publish Assessment</button>
+        </form>
+    </div>
+</body>
+</html>
