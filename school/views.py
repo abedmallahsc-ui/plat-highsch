@@ -121,7 +121,7 @@ def dashboard(request):
         if section not in {'assessments', 'program', 'grades', 'announcements'}:
             section = 'assessments'
         assessments = (
-            Assessment.objects.filter(school_class__in=class_ids)
+            Assessment.objects.filter(teacher=teacher, school_class__in=class_ids)
             .select_related('subject', 'teacher', 'school_class')
             .order_by('-created_at')
         )
@@ -129,7 +129,7 @@ def dashboard(request):
             assessments = assessments.filter(school_class_id=selected_class_id)
         assessments = assessments[:50]
         submissions = (
-            AssessmentSubmission.objects.filter(assessment__school_class__in=class_ids)
+            AssessmentSubmission.objects.filter(assessment__teacher=teacher, assessment__school_class__in=class_ids)
             .select_related('assessment', 'student')
             .order_by('-submitted_at')
         )
@@ -225,7 +225,7 @@ def review_submission(request, submission_id):
     submission = get_object_or_404(AssessmentSubmission, pk=submission_id)
     teacher = get_object_or_404(Teacher, user=request.user)
 
-    if submission.assessment.school_class not in teacher.school_classes.all():
+    if submission.assessment.teacher != teacher or submission.assessment.school_class not in teacher.school_classes.all():
         messages.error(request, 'You are not allowed to review this class assessment.')
         return redirect('dashboard')
 
