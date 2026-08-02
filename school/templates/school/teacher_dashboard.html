@@ -60,13 +60,22 @@
                     </div>
                 </div>
                 <table>
-                    <tr><th>Title</th><th>Class</th><th>Type</th><th>Due</th></tr>
+                    <tr>
+                        <th>Title</th>
+                        <th>Class</th>
+                        <th>Type</th>
+                        <th>Due</th>
+                        <th>Delete</th>
+                    </tr>
                     {% for assessment in assessments %}
                     <tr>
                         <td>{{ assessment.title }}</td>
                         <td>{{ assessment.school_class.name }}</td>
                         <td>{{ assessment.get_assessment_type_display }}</td>
                         <td>{{ assessment.due_date|default:"-" }}</td>
+                        <td>
+                        <a href="{% url 'delete_assessment' assessment.id %}" onclick="return confirm('Are you sure you want to delete this assessment?')">Delete</a>
+                    </td>
                     </tr>
                     {% empty %}
                     <tr><td colspan="4">No assessments yet.</td></tr>

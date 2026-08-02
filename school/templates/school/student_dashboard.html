@@ -56,16 +56,31 @@
                     </form>
                 </div>
                 <table>
-                    <tr><th>Title</th><th>Type</th><th>Due</th><th>Action</th></tr>
+                    <tr>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Attachment</th>
+                        <th>Due</th>
+                        <th>Action</th>
+                    </tr>
                     {% for assessment in assessments %}
                     <tr>
                         <td>{{ assessment.title }}</td>
                         <td>{{ assessment.get_assessment_type_display }}</td>
+                        <td>
+                            {% if assessment.attachment %}
+                            <a href="{{ assessment.attachment.url }}" target="_blank">download</a>
+                            {% else %}
+                            -
+                            {% endif %} 
+                        </td>
                         <td>{{ assessment.due_date|default:"-" }}</td>
-                        <td><a href="{% url 'submit_assessment' assessment.id %}">Upload</a></td>
+                        <td>
+                            <a href="{% url 'submit_assessment' assessment.id %}" class="btn">Submit</a>
+                        </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="4">No assessments yet.</td></tr>
+                    <tr><td colspan="5">No assessments yet.</td></tr>
                     {% endfor %}
                 </table>
             </div>

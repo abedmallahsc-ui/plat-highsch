@@ -57,6 +57,7 @@ class Assessment(models.Model):
     description = models.TextField(blank=True)
     due_date = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    attachment = models.FileField(upload_to='assessments/', blank=True, null=True)
 
     class Meta:
         indexes = [

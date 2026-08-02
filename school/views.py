@@ -209,6 +209,7 @@ def create_assessment(request):
             school_class=school_class,
             description=request.POST.get('description', ''),
             due_date=request.POST.get('due_date') or None,
+        attachment=request.FILES.get('attachment'),
         )
         messages.success(request, 'Assessment created successfully.')
         return redirect('dashboard')
@@ -219,6 +220,24 @@ def create_assessment(request):
     }
     return render(request, 'school/create_assessment.html', context)
 
+@login_required
+def delete_assessment(request, assessment_id):
+    if not hasattr(request.user, "teacher_profile"):
+        messages.error(request, "Only teachers can delete assessments.")
+        return redirect("dashboard")
+
+    teacher = request.user.teacher_profile
+
+    assessment = get_object_or_404(
+        Assessment,
+        id=assessment_id,
+        teacher=teacher
+    )
+
+    assessment.delete()
+
+    messages.success(request, "Assessment deleted successfully.")
+    return redirect("dashboard")
 
 @login_required
 def review_submission(request, submission_id):

@@ -17,7 +17,11 @@
     <div class="card">
         <h1>Create Assessment</h1>
         <p>Only your assigned subject and class sections can be selected.</p>
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
+            <div>
+                <label for="attachment">Attachment</label>
+                <input type="file" class="form-control" id="attachment" name="attachment">
+            </div>
             {% csrf_token %}
             <input type="text" name="title" placeholder="Assessment title" required>
             <select name="assessment_type" required>
