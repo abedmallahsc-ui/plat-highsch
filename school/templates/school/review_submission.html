@@ -22,7 +22,23 @@
             <p><strong>Assessment:</strong> {{ submission.assessment }}</p>
         </div>
         <p><strong>Submitted work:</strong></p>
-        <pre>{{ submission.content }}</pre>
+<pre>{{ submission.content }}</pre>
+
+{% if submission.attachment %}
+    <p>
+        <strong>Attachment:</strong>
+        <a href="{{ submission.attachment.url }}" target="_blank">
+            📄 Download Attachment
+        </a>
+    </p>
+{% endif %}
+
+{% if submission.image %}
+    <p><strong>Submitted Image:</strong></p>
+    <img src="{{ submission.image.url }}"
+         alt="Student submission"
+         style="max-width:100%; border-radius:12px; border:1px solid #ccc;">
+{% endif %}
 
         <form method="post">
             {% csrf_token %}
