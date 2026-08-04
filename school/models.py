@@ -125,3 +125,21 @@ class FinalGradeSheet(models.Model):
 
     def __str__(self):
         return f"{self.student.full_name} - {self.term}"
+
+class AssessmentAttachment(models.Model):
+    assessment = models.ForeignKey(Assessment, on_delete=models.CASCADE, related_name='attachments')
+    file = models.FileField(upload_to='assessments/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.file.name
+
+class SubmittionAttachment(models.Model):
+    submission = models.ForeignKey(AssessmentSubmission, on_delete=models.CASCADE, related_name='attachments')
+    file = models.FileField(upload_to='submissions/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.file.name
+
+    

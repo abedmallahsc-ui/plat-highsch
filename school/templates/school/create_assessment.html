@@ -20,7 +20,8 @@
         <form method="post" enctype="multipart/form-data">
             <div>
                 <label for="attachment">Attachment</label>
-                <input type="file" class="form-control" id="attachment" name="attachment">
+                <input type="file" class="form-control" id="attachment" name="attachment" multiple
+                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.mp4,.mov,.avi,.webm">
             </div>
             {% csrf_token %}
             <input type="text" name="title" placeholder="Assessment title" required>

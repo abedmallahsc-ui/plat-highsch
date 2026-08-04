@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import Assessment, AssessmentSubmission, FinalGradeSheet, Program, SchoolClass, Student, Subject, Teacher
+from .models import Assessment, AssessmentSubmission, FinalGradeSheet, Program, SchoolClass, Student, Subject, Teacher, AssessmentAttachment
 
 
 def teacher_allowed_subjects(teacher):
@@ -196,10 +196,23 @@ def create_assessment(request):
         class_id = request.POST.get('school_class')
         subject = get_object_or_404(Subject, pk=subject_id)
         school_class = get_object_or_404(SchoolClass, pk=class_id)
-
         if subject not in allowed_subjects or school_class not in allowed_classes:
             messages.error(request, 'You can only create assessments for your assigned subject and class.')
             return redirect('create_assessment')
+
+        allowed_extensions = {
+            "pdf", "doc", "docx",
+            "ppt", "pptx",
+            "xls", "xlsx",
+            "jpg", "jpeg", "png", "gif",
+        }
+
+        # Validate uploaded attachments
+        for f in request.FILES.getlist("attachments"):
+            extension = f.name.split(".")[-1].lower()
+            if extension not in allowed_extensions:
+                messages.error(request, f"{f.name}: Invalid file type. Videos are not supported.")
+                return redirect("create_assessment")
 
         assessment = Assessment.objects.create(
             title=request.POST.get('title', '').strip(),
@@ -209,8 +222,11 @@ def create_assessment(request):
             school_class=school_class,
             description=request.POST.get('description', ''),
             due_date=request.POST.get('due_date') or None,
-        attachment=request.FILES.get('attachment'),
+            attachment=request.FILES.get('attachment'),
         )
+
+        for f in request.FILES.getlist('attachments'):
+            AssessmentAttachment.objects.create(assessment=assessment, file=f)
         messages.success(request, 'Assessment created successfully.')
         return redirect('dashboard')
 
